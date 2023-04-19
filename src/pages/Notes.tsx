@@ -1,18 +1,21 @@
 import { Typography } from "antd";
 import NoteCard from "../components/NoteCard";
-import { MockNotes, MockHeatMapValues } from '../data/note';
+import { MockNotes, MockHeatMapValues, NoteType } from '../data/note';
 import HeatMap from '@uiw/react-heat-map';
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getNotes } from "../api/note";
 
 const { Title, Text } = Typography;
 
 const Notes: React.FC = () => {
     const [title, setTitle] = useState<string>('Notes');
+    const [notes, setNotes] = useState<NoteType[]>(MockNotes);
+    useEffect(() => {getNotes().then(res => {setNotes(notes.concat(res.notes));});},[]);
     return (
         <div className='flex justify-between'>
             <div className='px-16 py-8 w-full h-screen overflow-scroll'>
                 <Title>{title}</Title>
-                {MockNotes.map(note => <NoteCard key={note.id} {...note} />)}
+                {notes.map(note => <NoteCard key={note.id} {...note} />)}
             </div>
             <div className='px-4 py-8 h-full'>
                 <HeatMap
