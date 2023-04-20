@@ -4,7 +4,7 @@ import Tags from "../components/Tags";
 import { Button, Space, Typography, notification } from "antd";
 import { TagType, MockTags } from "../data/note";
 import { addNote } from "../api/note";
-import {  } from "remeda"
+import Vditor from "vditor";
 
 const { Title } = Typography;
 
@@ -29,6 +29,13 @@ const openNotification = (code:number) => {
                     '你还什么都没有写呢！',
             });
             break;
+        case -2:
+            notification.open({
+                message: '发生什么事了？🤔',
+                description:
+                    '编辑器好像跑路了！',
+            });
+            break;
         default:
             notification.open({
                 message: '保存失败😭！',
@@ -39,29 +46,33 @@ const openNotification = (code:number) => {
 };
 
 const NewNote = (props: NewNoteProps) => {
-    const [content, setContent] = useState<string>(props.content);
+    const [vd, setVd] = useState<Vditor>();
     const [tags, setTags] = useState<TagType[]>(props.tags ? props.tags : []);
 
     const handleClick = () => {
-        if (content.trim().length === 0) {
+        if (vd === undefined) {
+            openNotification(-2);
+            return;
+        }
+        if (vd.getValue().trim().length === 0) {
             openNotification(-1);
             return;
         }
-        addNote({id:0,content:content,create_date:Date.now(),tags:tags}).then(
+        addNote({id:0,content:vd.getValue(),create_date:Date.now(),tags:tags}).then(
             res => {
                 openNotification(res.code);
                 if (res.code === 0) {
-                    setContent("");
+                    vd.setValue("");
                     setTags([]);
                 }
             }
-        ).catch(_=>openNotification(-2));
+        ).catch(_=>openNotification(-3));
     }
     return (
         <div className="px-16 py-8">
             <Title>{props.title? props.title:"New Note"}</Title>
             <div className="p-8 shadow-md rounded-md bg-white">
-                <Editor content={content} setContent={setContent} />
+                <Editor setVd={setVd} />
                 <div className="flex justify-between items-center mt-4">
                     <Tags tags={tags} setTags={setTags}/>
                     <Button type="primary" onClick={handleClick}>Loging!</Button>
