@@ -40,7 +40,7 @@ const openNotification = (code:number) => {
 
 const NewNote = (props: NewNoteProps) => {
     const [content, setContent] = useState<string>(props.content);
-    const [tags, setTags] = useState<TagType[]>(props.tags ? props.tags : MockTags);
+    const [tags, setTags] = useState<TagType[]>(props.tags ? props.tags : []);
 
     const handleClick = () => {
         if (content.trim().length === 0) {
