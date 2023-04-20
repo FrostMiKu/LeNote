@@ -1,5 +1,5 @@
 import "vditor/dist/index.css";
-import React from "react";
+import {useRef,useEffect,useState} from "react";
 import Vditor from "vditor";
 
 interface EditorProps {
@@ -8,9 +8,9 @@ interface EditorProps {
 };
 
 const Editor = (props: EditorProps) => {
-  const editorRef = React.useRef<HTMLDivElement>(null);
-  const [vd, setVd] = React.useState<Vditor>();
-  React.useEffect(() => {
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [vd, setVd] = useState<Vditor>();
+  useEffect(() => {
     if (editorRef.current === null) return;
     const vditor = new Vditor(editorRef.current as HTMLElement, {
       after: () => {
@@ -25,6 +25,7 @@ const Editor = (props: EditorProps) => {
       }
     });
   }, []);
+  useEffect(() => {vd?.setValue(props.content)},[vd,props.content]);
   return <div ref={editorRef} className="vditor" />;
 };
 

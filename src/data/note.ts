@@ -2,7 +2,7 @@ export interface NoteType {
     id: number;
     content: string;
     tags: TagType[];
-    create_date: Date;
+    create_date: Date|number;
 }
 
 export interface TagType {
@@ -13,7 +13,7 @@ export interface TagType {
 
 export const MockTags: TagType[] = [
     {
-        id: 0,
+        id: 4,
         name: 'Todo',
         color: 'red',
     },
@@ -42,25 +42,25 @@ export const MockNotes: NoteType[] = [
         create_date: new Date(Date.now()),
     },
     {
-        id: 1,
+        id: -1,
         content: '## 💡 简介\n[Vditor](https://b3log.org/vditor) 是一款浏览器端的 Markdown 编辑器，支持所见即所得（富文本）、即时渲染（类似 Typora）和分屏预览模式。它使用 TypeScript 实现，支持原生 JavaScript、Vue、React、Angular，提供[桌面版](https://b3log.org/siyuan)。',
         tags: [MockTags[3]],
         create_date: new Date(Date.now()-50000),
     },
     {
-        id: 2,
+        id: -2,
         content: 'Vditor 是一款浏览器端的 Markdown 编辑器，支持所见即所得（富文本）、即时渲染（类似 Typora）和分屏预览模式。它使用 TypeScript 实现，支持原生 JavaScript、Vue、React、Angular，提供桌面版。Vditor 是一款浏览器端的 Markdown 编辑器，支持所见即所得（富文本）、即时渲染（类似 Typora）和分屏预览模式。它使用 TypeScript 实现，支持原生 JavaScript、Vue、React、Angular，提供桌面版。Vditor 是一款浏览器端的 Markdown 编辑器，支持所见即所得（富文本）、即时渲染（类似 Typora）和分屏预览模式。它使用 TypeScript 实现，支持原生 JavaScript、Vue、React、Angular，提供桌面版。',
         tags: [MockTags[3]],
         create_date: new Date(Date.now()-700000),
     },
     {
-        id: 3,
+        id: -3,
         content: '- [ ] 今天天气不错',
         tags: MockTags.filter(x=>x.id!==3),
         create_date: new Date(Date.now()-5000000000),
     },
     {
-        id: 4,
+        id: -4,
         content: '- [ ] 今天天气不错',
         tags: MockTags.filter(x=>x.id!==3),
         create_date: new Date(Date.now()-5000000000),

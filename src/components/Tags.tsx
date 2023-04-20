@@ -1,138 +1,111 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import type { InputRef } from 'antd';
-import { Space, Input, Tag, Tooltip, theme } from 'antd';
+import { Space, Input, Tag, theme } from 'antd';
+import { TagType } from '../data/note';
+import { uniqBy } from 'remeda';
 
-const Tags: React.FC = () => {
-  const { token } = theme.useToken();
-  const [tags, setTags] = useState<string[]>([]);
-  const [inputVisible, setInputVisible] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-  const [editInputIndex, setEditInputIndex] = useState(-1);
-  const [editInputValue, setEditInputValue] = useState('');
-  const inputRef = useRef<InputRef>(null);
-  const editInputRef = useRef<InputRef>(null);
+interface TagsProps {
+    tags: TagType[];
+    setTags: (tags: TagType[]) => void;
+}
 
-  useEffect(() => {
-    if (inputVisible) {
-      inputRef.current?.focus();
-    }
-  }, [inputVisible]);
+// 随机生成颜色, todo: 用户直接设置颜色
+const randomColor = () => {
+    const colors = [
+        "magenta",
+        "red",
+        "volcano",
+        "orange",
+        "gold",
+        "lime",
+        "green",
+        "cyan",
+        "blue",
+        "geekblue",
+        "purple"
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
 
-  useEffect(() => {
-    editInputRef.current?.focus();
-  }, [inputValue]);
+const Tags: React.FC<TagsProps> = (props: TagsProps) => {
+    const { token } = theme.useToken();
+    const [inputVisible, setInputVisible] = useState(false);
+    const [inputValue, setInputValue] = useState('');
+    const inputRef = useRef<InputRef>(null);
 
-  const handleClose = (removedTag: string) => {
-    const newTags = tags.filter((tag) => tag !== removedTag);
-    console.log(newTags);
-    setTags(newTags);
-  };
+    useEffect(() => {
+        if (inputVisible) {
+            inputRef.current?.focus();
+        }
+    }, [inputVisible]);
 
-  const showInput = () => {
-    setInputVisible(true);
-  };
+    const handleClose = (removedTag: TagType) => {
+        const newTags = props.tags.filter((tag) => tag.name !== removedTag.name);
+        props.setTags(newTags);
+    };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  };
+    const showInput = () => {
+        setInputVisible(true);
+    };
 
-  const handleInputConfirm = () => {
-    if (inputValue && tags.indexOf(inputValue) === -1) {
-      setTags([...tags, inputValue]);
-    }
-    setInputVisible(false);
-    setInputValue('');
-  };
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(e.target.value);
+    };
 
-  const handleEditInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEditInputValue(e.target.value);
-  };
-
-  const handleEditInputConfirm = () => {
-    const newTags = [...tags];
-    newTags[editInputIndex] = editInputValue;
-    setTags(newTags);
-    setEditInputIndex(-1);
-    setInputValue('');
-  };
-
-  const tagInputStyle: React.CSSProperties = {
-    width: 78,
-    verticalAlign: 'top',
-  };
-
-  const tagPlusStyle: React.CSSProperties = {
-    background: token.colorBgContainer,
-    borderStyle: 'dashed',
-  };
-
-  return (
-    <Space size={[0, 8]} wrap>
-      <Space size={[0, 8]} wrap>
-        {tags.map((tag, index) => {
-          if (editInputIndex === index) {
-            return (
-              <Input
-                ref={editInputRef}
-                key={tag}
-                size="small"
-                style={tagInputStyle}
-                value={editInputValue}
-                onChange={handleEditInputChange}
-                onBlur={handleEditInputConfirm}
-                onPressEnter={handleEditInputConfirm}
-              />
+    const mockID = useRef(0); // id 由后端生成，新标签的 id 由前端 mock，除了显示没啥用
+    const handleInputConfirm = () => {
+        if (inputValue) {
+            props.setTags(
+                uniqBy([...props.tags, { id: mockID.current, name: inputValue, color: randomColor() }], tag => tag.name)
             );
-          }
-          const isLongTag = tag.length > 20;
-          const tagElem = (
-            <Tag
-              key={tag}
-              closable={index !== 0}
-              style={{ userSelect: 'none' }}
-              onClose={() => handleClose(tag)}
-            >
-              <span
-                onDoubleClick={(e) => {
-                  if (index !== 0) {
-                    setEditInputIndex(index);
-                    setEditInputValue(tag);
-                    e.preventDefault();
-                  }
-                }}
-              >
-                {isLongTag ? `${tag.slice(0, 20)}...` : tag}
-              </span>
-            </Tag>
-          );
-          return isLongTag ? (
-            <Tooltip title={tag} key={tag}>
-              {tagElem}
-            </Tooltip>
-          ) : (
-            tagElem
-          );
-        })}
-      </Space>
-      {inputVisible ? (
-        <Input
-          ref={inputRef}
-          type="text"
-          size="small"
-          style={tagInputStyle}
-          value={inputValue}
-          onChange={handleInputChange}
-          onBlur={handleInputConfirm}
-          onPressEnter={handleInputConfirm}
-        />
-      ) : (
-        <Tag style={tagPlusStyle} onClick={showInput}>
-          <PlusOutlined /> New Tag
-        </Tag>
-      )}
-    </Space>
-  );
-};
+        }
+        setInputVisible(false);
+        setInputValue('');
+        mockID.current --;
+    };
+
+    const tagInputStyle: React.CSSProperties = {
+        width: '100%',
+        borderStyle: 'dashed',
+    };
+    const tagPlusStyle: React.CSSProperties = {
+        background: token.colorBgContainer,
+        borderStyle: 'dashed',
+    };
+
+    return (
+        <div>
+            <Space size={[0, 8]} wrap>
+                <div>
+                {props.tags.map(
+                    tag => <Tag key={tag.id} bordered={false} color={tag.color} closable onClose={()=>{handleClose(tag)}}>{tag.name}</Tag>
+                    )
+                }
+                </div>
+                {props.tags.length < 8? //最多8个标签，前端限制
+                <div>
+                    {inputVisible ? (
+                        <Input
+                          ref={inputRef}
+                          type="text"
+                          size="small"
+                          style={tagInputStyle}
+                          value={inputValue}
+                          onChange={handleInputChange}
+                          onBlur={handleInputConfirm}
+                          onPressEnter={handleInputConfirm}
+                        />
+                      ) : (
+                        <Tag style={tagPlusStyle} onClick={showInput}>
+                          <PlusOutlined /> 新标签
+                        </Tag>
+                      )}
+                </div>:null
+                }
+            </Space>
+        </div>
+    )
+}
 
 export default Tags;

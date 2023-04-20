@@ -6,18 +6,21 @@ Siyuan/Trilium/Obsidian 用了一圈，最终还是决定自己造一个...
 
 ![截图](screenshot/screenshot-1.png)
 ![截图](screenshot/screenshot-2.png)
+![截图](screenshot/screenshot-3.png)
 
 
 ### Todo
 
 - 写后端
-- 实现删除
-- 实现过滤器
 - 实现模版
 - 实现设置
+- 实现查找
 
 ### Doing
-- 最小可用版本
+- 笔记编辑
+- 自动保存
+- 过滤器
 
 ### Done
 - 笔记渲染页面
+- 最小可用版本
