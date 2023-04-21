@@ -1,3 +1,5 @@
+import { HeatMapValue } from "@uiw/react-heat-map";
+
 export interface NoteType {
     id: number;
     content: string;
@@ -67,7 +69,7 @@ export const MockNotes: NoteType[] = [
     }
 ];
 
-export const MockHeatMapValues = [
+export const MockHeatMapValues:HeatMapValue[] = [
     { date: '2023/01/11', count: 2, content: "test" },
     { date: '2023/04/12', count: 2, content: "test" },
     { date: '2023/05/01', count: 5, content: "test" },

@@ -17,3 +17,8 @@ export const addNote = async (note:NoteType) => {
   const { data } = await axios.post(baseUrl+"/notes",{...note});
   return data;
 }
+
+export const delNote = async (id:number) => {
+  const { data } = await axios.delete(baseUrl+"/notes/"+id);
+  return data;
+}
