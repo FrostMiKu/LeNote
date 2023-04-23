@@ -13,13 +13,13 @@ interface NewNoteProps {
     content: string;
     tags?: TagType[];
 }
-const openNotification = (code:number) => {
+const openNotification = (code: number) => {
     switch (code) {
         case 0:
             notification.open({
                 message: '保存成功😊！',
                 description:
-                  '您的笔记已经保存成功！',
+                    '您的笔记已经保存成功！',
             });
             break;
         case -1:
@@ -40,7 +40,7 @@ const openNotification = (code:number) => {
             notification.open({
                 message: '保存失败😭！',
                 description:
-                  '您的笔记未能成功保存！',
+                    '您的笔记未能成功保存！',
             });
     }
 };
@@ -58,7 +58,7 @@ const NewNote = (props: NewNoteProps) => {
             openNotification(-1);
             return;
         }
-        addNote({id:0,content:vd.getValue(),create_date:Date.now(),tags:tags}).then(
+        addNote({ id: 0, content: vd.getValue(), create_date: Date.now(), tags: tags }).then(
             res => {
                 openNotification(res.code);
                 if (res.code === 0) {
@@ -66,16 +66,16 @@ const NewNote = (props: NewNoteProps) => {
                     setTags([]);
                 }
             }
-        ).catch(_=>openNotification(-3));
+        ).catch(_ => openNotification(-3));
     }
     return (
         <div className="px-16 py-8">
-            <Title>{props.title? props.title:"New Note"}</Title>
+            <Title>{props.title ? props.title : "New Note"}</Title>
             <div className="p-8 shadow-md rounded-md bg-white">
                 <Editor setVd={setVd} />
                 <div className="flex justify-between items-center mt-4">
-                    <Tags tags={tags} setTags={setTags}/>
-                    <Button type="primary" onClick={handleClick}>Loging!</Button>
+                    <Tags tags={tags} setTags={setTags} />
+                    <Button type="primary" onClick={handleClick}>✍🏼 Loging!</Button>
                 </div>
             </div>
         </div>

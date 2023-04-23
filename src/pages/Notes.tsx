@@ -13,10 +13,10 @@ const { Title, Text } = Typography;
 const Notes: React.FC = () => {
     const offset = useRef(0);
     const [loading, setLoading] = useState<boolean>(false);
-    const [title, setTitle] = useState<string>('Notes');
+    const [title, setTitle] = useState<string>('📔 Notes');
     const [notes, setNotes] = useState<NoteType[]>([]);
     useEffect(() => {
-        getNotes(offset.current,5).then(
+        getNotes(offset.current, 10).then(
             res => {
                 setNotes(
                     sortBy(notes.concat(res.data.notes), [note => note.create_date, 'desc'])
@@ -24,24 +24,24 @@ const Notes: React.FC = () => {
                 offset.current = notes.length + res.data.notes.length;
                 console.log(offset.current);
             });
-    },[]);
+    }, []);
 
     const handleLoadMore = () => {
         setLoading(true);
-        getNotes(offset.current,5).then(
+        getNotes(offset.current, 10).then(
             res => {
                 if (res.data.notes.length === 0) {
                     notification.open({
                         message: '没有更多了😊！',
                     });
-                }else{
+                } else {
                     setNotes(
                         sortBy(notes.concat(res.data.notes), [note => note.create_date, 'desc'])
                     );
                     offset.current = notes.length + res.data.notes.length;
                 }
                 setLoading(false);
-            }).catch(()=>
+            }).catch(() =>
                 notification.open({
                     message: '加载失败😭！',
                 })
@@ -56,10 +56,12 @@ const Notes: React.FC = () => {
         <div className='flex justify-between'>
             <div className='px-16 py-8 w-full h-screen overflow-scroll'>
                 <Title>{title}</Title>
-                { notes.length === 0 ? <Empty description={<Text>暂无笔记</Text>} className="w-full"/>:
-                    notes.map(note => <NoteCard key={note.id} note={note} onDelete={handleDelete} />)
+                {notes.length === 0 ? <Empty description={<Text>暂无笔记</Text>} className="w-full" /> :
+                    <>
+                        {notes.map(note => <NoteCard key={note.id} note={note} onDelete={handleDelete} />)}
+                        <div className="cursor-pointer w-full text-center text-gray-400" onClick={handleLoadMore}>点击这里，加载更多</div>
+                    </>
                 }
-                <div className="cursor-pointer w-full text-center text-gray-400" onClick={handleLoadMore}>点击这里，加载更多</div>
             </div>
             <div className='px-4 py-8 h-full'>
                 <HeatMap
@@ -71,16 +73,17 @@ const Notes: React.FC = () => {
                     rectRender={(props, data) => {
                         // if (!data.count) return <rect {...props} />;
                         return (
-                          <Tooltip key={props.key} placement="top" title={`${data.date} 共 ${data.count||0} 条 Note`}>
-                            <rect {...props} />
-                          </Tooltip>
+                            <Tooltip key={props.key} placement="top" title={`${data.date} 共 ${data.count || 0} 条 Note`}>
+                                <rect {...props} />
+                            </Tooltip>
                         );
-                      }}
+                    }}
                 />
-                <Button type="primary" className="mt-4" onClick={()=>{setNotes(
-                    filter(notes, note => filter(note.tags, tag => tag.name.toLowerCase() === 'todo').length > 0)
-                );
-                setTitle('Todo');
+                <Button type="primary" className="mt-4" onClick={() => {
+                    setNotes(
+                        filter(notes, note => filter(note.tags, tag => tag.name.toLowerCase() === 'todo').length > 0)
+                    );
+                    setTitle('Todo');
                 }}>Todo</Button>
             </div>
         </div>
