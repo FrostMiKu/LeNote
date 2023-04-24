@@ -12,6 +12,7 @@ dayjs.extend(relativeTime);
 interface NoteCardProps {
     note: NoteType;
     onDelete?: (id: number) => void;
+    onEdit?: (note: NoteType) => void;
 }
 
 //todo: 实现功能
@@ -37,7 +38,7 @@ const NoteCard: React.FC<NoteCardProps> = (props: NoteCardProps) => {
                 });
                 break;
             case 'edit':
-                console.log('edit');
+                props.onEdit?props.onEdit(props.note):undefined;
                 break;
             default:
                 console.log('default');

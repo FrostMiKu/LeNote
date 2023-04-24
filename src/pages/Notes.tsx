@@ -2,11 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import { sortBy, filter } from 'remeda'
 import { Typography, notification, Empty, Button, Tooltip } from "antd";
 import NoteCard from "../components/NoteCard";
-import { MockNotes, MockHeatMapValues, NoteType } from '../data/note';
+import { MockNotes, MockHeatMapValues, NoteType, TagType } from '../data/note';
 import HeatMap from '@uiw/react-heat-map';
 import { getNotes } from "../api/note";
 import { notes2HeatmapData } from "../utils";
 import dayjs from "dayjs";
+import Editor from "../components/Editor";
+import Vditor from "vditor";
 
 const { Title, Text } = Typography;
 
@@ -15,6 +17,9 @@ const Notes: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [title, setTitle] = useState<string>('📔 Notes');
     const [notes, setNotes] = useState<NoteType[]>([]);
+    const [edit, setEdit] = useState<boolean>(false);
+    const [vd, setVd] = useState<Vditor>();
+    const [editNote, setEditNote] = useState<NoteType | undefined>(undefined);
     useEffect(() => {
         getNotes(offset.current, 10).then(
             res => {
@@ -22,7 +27,7 @@ const Notes: React.FC = () => {
                     sortBy(notes.concat(res.data.notes), [note => note.create_date, 'desc'])
                 );
                 offset.current = notes.length + res.data.notes.length;
-                console.log(offset.current);
+                // console.log(offset.current);
             });
     }, []);
 
@@ -52,13 +57,35 @@ const Notes: React.FC = () => {
         setNotes(filter(notes, note => note.id !== id));
     }
 
+    const handleEdit = (note: NoteType) => {
+        setEdit(true);
+        setEditNote(note);
+        setTitle('📝 编辑笔记');
+        vd?.setValue(note.content);
+    }
+
+    const handleSetTags = (tags: TagType[]) => {
+        if (editNote !== undefined) {
+            setEditNote({ ...editNote, tags: tags });
+        }
+    }
+
+    const handleLogging = () => {
+        if (editNote !== undefined) {
+            setEditNote({...editNote, content: vd?.getValue()!})
+        }
+        setEdit(false);
+        setTitle('📔 Notes');
+        // setEditNote(undefined);
+    }
+
     return (
         <div className='flex justify-between'>
             <div className='px-16 py-8 w-full h-screen overflow-scroll'>
                 <Title>{title}</Title>
-                {notes.length === 0 ? <Empty description={<Text>暂无笔记</Text>} className="w-full" /> :
+                {notes.length === 0 ? <Empty description={<Text className="text-gray-400">暂无笔记</Text>} className="w-full" /> :
                     <>
-                        {notes.map(note => <NoteCard key={note.id} note={note} onDelete={handleDelete} />)}
+                        {notes.map(note => <NoteCard key={note.id} note={note} onDelete={handleDelete} onEdit={handleEdit} />)}
                         <div className="cursor-pointer w-full text-center text-gray-400" onClick={handleLoadMore}>点击这里，加载更多</div>
                     </>
                 }

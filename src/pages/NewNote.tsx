@@ -2,7 +2,7 @@ import { useState } from "react";
 import Editor from "../components/Editor";
 import Tags from "../components/Tags";
 import { Button, Space, Typography, notification } from "antd";
-import { TagType, MockTags } from "../data/note";
+import { TagType, MockTags, NoteType } from "../data/note";
 import { addNote } from "../api/note";
 import Vditor from "vditor";
 
@@ -45,9 +45,12 @@ const openNotification = (code: number) => {
     }
 };
 
+const emptyNote = ():NoteType=>{return {id:0, content:"", create_date:Date.now(), tags:[]}}
+
 const NewNote = (props: NewNoteProps) => {
     const [vd, setVd] = useState<Vditor>();
-    const [tags, setTags] = useState<TagType[]>(props.tags ? props.tags : []);
+    // const [tags, setTags] = useState<TagType[]>(props.tags ? props.tags : []);
+    const [note, setNote] = useState<NoteType>(emptyNote());
 
     const handleClick = () => {
         if (vd === undefined) {
@@ -58,26 +61,20 @@ const NewNote = (props: NewNoteProps) => {
             openNotification(-1);
             return;
         }
-        addNote({ id: 0, content: vd.getValue(), create_date: Date.now(), tags: tags }).then(
+        addNote({...note, content:vd.getValue(), create_date:Date.now()}).then(
             res => {
                 openNotification(res.code);
                 if (res.code === 0) {
                     vd.setValue("");
-                    setTags([]);
+                    setNote(emptyNote());
                 }
             }
         ).catch(_ => openNotification(-3));
     }
     return (
-        <div className="px-16 py-8">
-            <Title>{props.title ? props.title : "New Note"}</Title>
-            <div className="p-8 shadow-md rounded-md bg-white">
-                <Editor setVd={setVd} />
-                <div className="flex justify-between items-center mt-4">
-                    <Tags tags={tags} setTags={setTags} />
-                    <Button type="primary" onClick={handleClick}>✍🏼 Loging!</Button>
-                </div>
-            </div>
+        <div className="px-16 py-8 h-screen">
+            <Title>{props.title ? props.title : "📝 新建笔记"}</Title>
+            <Editor setVd={setVd} note={note} setNote={setNote} onLoging={handleClick} />
         </div>
     );
 }

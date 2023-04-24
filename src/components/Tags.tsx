@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
-import type { InputRef } from 'antd';
+import { AutoComplete, InputRef } from 'antd';
 import { Space, Input, Tag, theme } from 'antd';
 import { TagType } from '../data/note';
 import { uniqBy } from 'remeda';
@@ -49,8 +49,11 @@ const Tags: React.FC<TagsProps> = (props: TagsProps) => {
         setInputVisible(true);
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(e.target.value);
+    // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     setInputValue(e.target.value);
+    // };
+    const handleInputChange = (value:string) => {
+        setInputValue(value);
     };
 
     const mockID = useRef(0); // id 由后端生成，新标签的 id 由前端 mock，除了显示没啥用
@@ -62,7 +65,7 @@ const Tags: React.FC<TagsProps> = (props: TagsProps) => {
         }
         setInputVisible(false);
         setInputValue('');
-        mockID.current --;
+        mockID.current--;
     };
 
     const tagInputStyle: React.CSSProperties = {
@@ -74,34 +77,34 @@ const Tags: React.FC<TagsProps> = (props: TagsProps) => {
         borderStyle: 'dashed',
     };
 
+    const options = [{ value: 'Todo' }, { value: '📓 日记'}, { value: '测试' }];
     return (
         <div>
             <Space size={[0, 8]} wrap>
                 <div>
-                {props.tags.map(
-                    tag => <Tag key={tag.id} bordered={false} color={tag.color} closable onClose={()=>{handleClose(tag)}}>{tag.name}</Tag>
+                    {props.tags.map(
+                        tag => <Tag key={tag.id} bordered={false} color={tag.color} closable onClose={() => { handleClose(tag) }}>{tag.name}</Tag>
                     )
-                }
+                    }
                 </div>
-                {props.tags.length < 8? //最多8个标签，前端限制
-                <div>
-                    {inputVisible ? (
-                        <Input
-                          ref={inputRef}
-                          type="text"
-                          size="small"
-                          style={tagInputStyle}
-                          value={inputValue}
-                          onChange={handleInputChange}
-                          onBlur={handleInputConfirm}
-                          onPressEnter={handleInputConfirm}
-                        />
-                      ) : (
-                        <Tag style={tagPlusStyle} onClick={showInput}>
-                          <PlusOutlined /> 新标签
-                        </Tag>
-                      )}
-                </div>:null
+                {props.tags.length < 8 ? //最多8个标签，前端限制
+                    <div>
+                        {inputVisible ? (
+                            <AutoComplete
+                                options={options}
+                                style={{ width: 200 }}
+                                onChange={handleInputChange}
+                                onSelect={handleInputChange}
+                                onBlur={ handleInputConfirm }
+                                // onSearch={(text) => setOptions(getPanelValue(text))}
+                                placeholder="新标签"
+                            />
+                        ) : (
+                            <Tag style={tagPlusStyle} onClick={showInput}>
+                                <PlusOutlined /> 新标签
+                            </Tag>
+                        )}
+                    </div> : null
                 }
             </Space>
         </div>
