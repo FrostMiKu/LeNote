@@ -18,6 +18,7 @@ interface NotesProps {
 const Notes: React.FC<NotesProps> = (props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [title, setTitle] = useState<string>('📔 Notes');
+    const [filters, setFilters] = useState<((note:NoteType)=>boolean)[]>([_=>true]);
     const { notes, onNotesChange } = props;
 
     useEffect(() => {
@@ -30,6 +31,10 @@ const Notes: React.FC<NotesProps> = (props) => {
                 });
         }
     }, [notes]);
+
+    const notesFilter = (notes: NoteType[]) => {
+        return filter(notes, note => filters.every(filter => filter(note)));
+    }
 
     const handleLoadMore = () => {
         setLoading(true);
@@ -62,9 +67,9 @@ const Notes: React.FC<NotesProps> = (props) => {
         <div className='flex justify-between'>
             <div className='px-16 py-8 w-full h-screen overflow-scroll'>
                 <Title>{title}</Title>
-                {notes.length === 0 ? <Empty description={<Text className="text-gray-400">暂无笔记</Text>} className="w-full" /> :
+                {notesFilter(notes).length === 0 ? <Empty description={<Text className="text-gray-400">暂无笔记</Text>} className="w-full" /> :
                     <>
-                        {notes.map(note => <NoteCard key={note.id} note={note} onDelete={handleDelete} />)}
+                        {notesFilter(notes).map(note => <NoteCard key={note.id} note={note} onDelete={handleDelete} />)}
                         <div className="cursor-pointer w-full text-center text-gray-400" onClick={handleLoadMore}>点击这里，加载更多</div>
                     </>
                 }
@@ -85,9 +90,7 @@ const Notes: React.FC<NotesProps> = (props) => {
                     }}
                 />
                 <Button type="primary" className="mt-4" onClick={() => {
-                    onNotesChange(
-                        filter(notes, note => filter(note.tags, tag => tag.name.toLowerCase() === 'todo').length > 0)
-                    );
+                    setFilters([note => filter(note.tags, tag => tag.name.toLowerCase() === 'todo').length > 0]);
                     setTitle('Todo');
                 }}>Todo</Button>
             </div>
