@@ -12,6 +12,7 @@ interface NewNoteProps {
     title?: string;
     content: string;
     tags?: TagType[];
+    onLoging: (note:NoteType) => void;
 }
 const openNotification = (code: number) => {
     switch (code) {
@@ -67,6 +68,7 @@ const NewNote = (props: NewNoteProps) => {
                 if (res.code === 0) {
                     vd.setValue("");
                     setNote(emptyNote());
+                    props.onLoging(res.data.note);
                 }
             }
         ).catch(_ => openNotification(-3));

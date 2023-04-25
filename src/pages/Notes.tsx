@@ -1,49 +1,50 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { sortBy, filter } from 'remeda'
 import { Typography, notification, Empty, Button, Tooltip } from "antd";
 import NoteCard from "../components/NoteCard";
-import { MockNotes, MockHeatMapValues, NoteType, TagType } from '../data/note';
+import { NoteType } from '../data/note';
 import HeatMap from '@uiw/react-heat-map';
 import { getNotes } from "../api/note";
 import { notes2HeatmapData } from "../utils";
 import dayjs from "dayjs";
-import Editor from "../components/Editor";
-import Vditor from "vditor";
 
 const { Title, Text } = Typography;
 
-const Notes: React.FC = () => {
-    const offset = useRef(0);
+interface NotesProps {
+    notes: NoteType[];
+    onNotesChange: (notes: NoteType[]) => void;
+}
+
+const Notes: React.FC<NotesProps> = (props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [title, setTitle] = useState<string>('📔 Notes');
-    const [notes, setNotes] = useState<NoteType[]>([]);
-    const [edit, setEdit] = useState<boolean>(false);
-    const [vd, setVd] = useState<Vditor>();
-    const [editNote, setEditNote] = useState<NoteType | undefined>(undefined);
+    const { notes, onNotesChange } = props;
+
     useEffect(() => {
-        getNotes(offset.current, 10).then(
-            res => {
-                setNotes(
-                    sortBy(notes.concat(res.data.notes), [note => note.create_date, 'desc'])
-                );
-                offset.current = notes.length + res.data.notes.length;
-                // console.log(offset.current);
-            });
-    }, []);
+        if (notes.length === 0) {
+            getNotes(0, 10).then(
+                res => {
+                    onNotesChange(
+                        sortBy(res.data.notes as NoteType[], [note => note.create_date, 'desc'])
+                    );
+                });
+        }
+    }, [notes]);
 
     const handleLoadMore = () => {
         setLoading(true);
-        getNotes(offset.current, 10).then(
+        console.log(notes.length);
+
+        getNotes(notes.length, 10).then(
             res => {
                 if (res.data.notes.length === 0) {
                     notification.open({
                         message: '没有更多了😊！',
                     });
                 } else {
-                    setNotes(
+                    onNotesChange(
                         sortBy(notes.concat(res.data.notes), [note => note.create_date, 'desc'])
                     );
-                    offset.current = notes.length + res.data.notes.length;
                 }
                 setLoading(false);
             }).catch(() =>
@@ -54,29 +55,7 @@ const Notes: React.FC = () => {
     }
 
     const handleDelete = (id: number) => {
-        setNotes(filter(notes, note => note.id !== id));
-    }
-
-    const handleEdit = (note: NoteType) => {
-        setEdit(true);
-        setEditNote(note);
-        setTitle('📝 编辑笔记');
-        vd?.setValue(note.content);
-    }
-
-    const handleSetTags = (tags: TagType[]) => {
-        if (editNote !== undefined) {
-            setEditNote({ ...editNote, tags: tags });
-        }
-    }
-
-    const handleLogging = () => {
-        if (editNote !== undefined) {
-            setEditNote({...editNote, content: vd?.getValue()!})
-        }
-        setEdit(false);
-        setTitle('📔 Notes');
-        // setEditNote(undefined);
+        onNotesChange(filter(notes, note => note.id !== id));
     }
 
     return (
@@ -85,7 +64,7 @@ const Notes: React.FC = () => {
                 <Title>{title}</Title>
                 {notes.length === 0 ? <Empty description={<Text className="text-gray-400">暂无笔记</Text>} className="w-full" /> :
                     <>
-                        {notes.map(note => <NoteCard key={note.id} note={note} onDelete={handleDelete} onEdit={handleEdit} />)}
+                        {notes.map(note => <NoteCard key={note.id} note={note} onDelete={handleDelete} />)}
                         <div className="cursor-pointer w-full text-center text-gray-400" onClick={handleLoadMore}>点击这里，加载更多</div>
                     </>
                 }
@@ -98,7 +77,6 @@ const Notes: React.FC = () => {
                     startDate={dayjs().subtract(19, 'week').toDate()}
                     endDate={new Date()}
                     rectRender={(props, data) => {
-                        // if (!data.count) return <rect {...props} />;
                         return (
                             <Tooltip key={props.key} placement="top" title={`${data.date} 共 ${data.count || 0} 条 Note`}>
                                 <rect {...props} />
@@ -107,7 +85,7 @@ const Notes: React.FC = () => {
                     }}
                 />
                 <Button type="primary" className="mt-4" onClick={() => {
-                    setNotes(
+                    onNotesChange(
                         filter(notes, note => filter(note.tags, tag => tag.name.toLowerCase() === 'todo').length > 0)
                     );
                     setTitle('Todo');
