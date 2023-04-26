@@ -27,3 +27,8 @@ export const updateNote = async (note:NoteType) => {
   const { data } = await axios.put(baseUrl+"/note/",{...note});
   return data;
 }
+
+export const getTags = async () => {
+  const { data } = await axios.get(baseUrl+"/tag");
+  return data;
+}

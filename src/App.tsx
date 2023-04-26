@@ -1,11 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Layout, theme } from "antd";
 import MainMenu from './components/MainMenu'
 import Notes from "./pages/Notes";
 import Settings from "./pages/Settings";
 import NewNote from "./pages/NewNote";
 import Vditor from 'vditor';
-import { NoteType } from './data/note';
+import { NoteType, TagType } from './data/note';
+import { getTags } from './api/api';
 
 const { Sider, Content } = Layout;
 
@@ -13,10 +14,17 @@ const { Sider, Content } = Layout;
 function App() {
   const [page, setPage] = useState("notes");
   const [notes, setNotes] = useState<NoteType[]>([]);
+  const [tags, setTags] = useState<TagType[]>([]);
   const [editNote, setEditNote] = useState<NoteType>();
   const {
     token: { colorBgContainer },
   } = theme.useToken();
+
+  useEffect(() => {
+    getTags().then((res) => {
+      setTags(res.data.tags);
+    });
+  }, [notes]);
 
   const handleEditNote = (note: NoteType) => {
     setEditNote(note);
@@ -34,15 +42,15 @@ function App() {
   function switchPages(page: string) {
     switch (page) {
       case "notes":
-        return <Notes notes={notes} onNotesChange={setNotes} onEditNote={handleEditNote} />;
+        return <Notes notes={notes} tags={tags} onNotesChange={setNotes} onEditNote={handleEditNote} />;
       case "settings":
         return <Settings />;
       case "newnote":
-        return <NewNote onLoging={(note)=>{setNotes([note,...notes]);setPage('notes')}}/>;
+        return <NewNote tags={tags} onLoging={(note)=>{setNotes([note,...notes]);setPage('notes')}}/>;
       case "editnote":
         return <NewNote onLoging={handleUpdateNote} note={editNote} update />;
       default:
-        return <Notes notes={notes} onNotesChange={setNotes} onEditNote={handleEditNote} />;
+        return <Notes notes={notes} tags={tags} onNotesChange={setNotes} onEditNote={handleEditNote} />;
     }
   }
 

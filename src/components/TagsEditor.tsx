@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { PlusOutlined } from '@ant-design/icons';
 import { AutoComplete, InputRef } from 'antd';
-import { Space, Input, Tag, theme } from 'antd';
+import { Space, Tag, theme } from 'antd';
 import { TagType } from '../data/note';
-import { uniqBy } from 'remeda';
+import { objOf, uniqBy } from 'remeda';
 
-interface TagsProps {
+interface TagsEditorProps {
     tags: TagType[];
     setTags: (tags: TagType[]) => void;
+    all_tags?: TagType[];
 }
 
 // 随机生成颜色, todo: 用户直接设置颜色
@@ -28,7 +29,7 @@ const randomColor = () => {
     return colors[Math.floor(Math.random() * colors.length)];
 }
 
-const Tags: React.FC<TagsProps> = (props: TagsProps) => {
+const Tags: React.FC<TagsEditorProps> = (props: TagsEditorProps) => {
     const { token } = theme.useToken();
     const [inputVisible, setInputVisible] = useState(false);
     const [inputValue, setInputValue] = useState('');
@@ -49,9 +50,6 @@ const Tags: React.FC<TagsProps> = (props: TagsProps) => {
         setInputVisible(true);
     };
 
-    // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     setInputValue(e.target.value);
-    // };
     const handleInputChange = (value:string) => {
         setInputValue(value);
     };
@@ -68,16 +66,12 @@ const Tags: React.FC<TagsProps> = (props: TagsProps) => {
         mockID.current--;
     };
 
-    const tagInputStyle: React.CSSProperties = {
-        width: '100%',
-        borderStyle: 'dashed',
-    };
     const tagPlusStyle: React.CSSProperties = {
         background: token.colorBgContainer,
         borderStyle: 'dashed',
     };
 
-    const options = [{ value: 'Todo' }, { value: '📓 日记'}, { value: '测试' }];
+    const options = (props.all_tags ?? []).map(tag => objOf(tag.name, 'value'));
     return (
         <div>
             <Space size={[0, 8]} wrap>

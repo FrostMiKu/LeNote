@@ -1,9 +1,9 @@
 import { useState } from "react";
 import Editor from "../components/Editor";
-import Tags from "../components/Tags";
+import Tags from "../components/TagsEditor";
 import { Button, Space, Typography, notification } from "antd";
 import { TagType, MockTags, NoteType } from "../data/note";
-import { addNote, updateNote } from "../api/note";
+import { addNote, updateNote } from "../api/api";
 import Vditor from "vditor";
 
 const { Title } = Typography;
@@ -11,6 +11,7 @@ const { Title } = Typography;
 interface NewNoteProps {
     update?: boolean;
     note?: NoteType;
+    tags?: TagType[]; //for auto complete
     onLoging: (note:NoteType) => void;
 }
 const openNotification = (code: number) => {
@@ -87,7 +88,7 @@ const NewNote = (props: NewNoteProps) => {
     return (
         <div className="px-16 py-8 h-screen">
             <Title>{props.update? "📝 更新笔记" : "📝 新建笔记"}</Title>
-            <Editor setVd={setVd} note={note} setNote={setNote} onClick={handleClick} />
+            <Editor setVd={setVd} note={note} setNote={setNote} onClick={handleClick} tags={props.tags} />
         </div>
     );
 }

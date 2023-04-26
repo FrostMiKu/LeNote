@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import Vditor from 'vditor';
 import { NoteType } from '../data/note';
-import { delNote } from '../api/note';
+import { delNote } from '../api/api';
 import { Tag, Space, notification, Dropdown, MenuProps } from 'antd';
 import { DeleteOutlined, MoreOutlined } from '@ant-design/icons';
 import relativeTime from 'dayjs/plugin/relativeTime';

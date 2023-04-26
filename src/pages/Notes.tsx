@@ -2,16 +2,19 @@ import { useEffect, useState } from "react";
 import { sortBy, filter } from 'remeda'
 import { Typography, notification, Empty, Button, Tooltip } from "antd";
 import NoteCard from "../components/NoteCard";
-import { NoteType } from '../data/note';
+import { NoteType, TagType } from '../data/note';
 import HeatMap from '@uiw/react-heat-map';
-import { getNotes } from "../api/note";
+import { getNotes } from "../api/api";
 import { notes2HeatmapData } from "../utils";
 import dayjs from "dayjs";
+import TagsList from "../components/TagsList";
+import { TagsFilled } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
 interface NotesProps {
     notes: NoteType[];
+    tags: TagType[];
     onNotesChange: (notes: NoteType[]) => void;
     onEditNote: (note: NoteType) => void;
 }
@@ -88,10 +91,11 @@ const Notes: React.FC<NotesProps> = (props) => {
                         );
                     }}
                 />
-                <Button type="primary" className="mt-4" onClick={() => {
-                    setFilters([note => filter(note.tags, tag => tag.name.toLowerCase() === 'todo').length > 0]);
-                    setTitle('Todo');
-                }}>Todo</Button>
+                <Title level={3}>🏷️ Tags</Title>
+                <TagsList tags={props.tags} onClick={(tag) => {
+                    setFilters([note => filter(note.tags, item => item.name.toLowerCase() === tag.name.toLocaleLowerCase()).length > 0]);
+                    setTitle(tag.name);
+                } } />
             </div>
         </div>
     );
