@@ -12,22 +12,37 @@ const { Sider, Content } = Layout;
 
 function App() {
   const [page, setPage] = useState("notes");
-  const [vd, setVd] = useState<Vditor>();
   const [notes, setNotes] = useState<NoteType[]>([]);
+  const [editNote, setEditNote] = useState<NoteType>();
   const {
     token: { colorBgContainer },
   } = theme.useToken();
 
+  const handleEditNote = (note: NoteType) => {
+    setEditNote(note);
+    setPage("editnote");
+  }
+
+  const handleUpdateNote = (note: NoteType) => {
+    const item = notes.find((n) => n.id === note.id);
+    if (item === undefined) return;
+    item.content = note.content;
+    item.tags = note.tags;
+    setPage("notes");
+  }
+
   function switchPages(page: string) {
     switch (page) {
       case "notes":
-        return <Notes notes={notes} onNotesChange={setNotes} />;
+        return <Notes notes={notes} onNotesChange={setNotes} onEditNote={handleEditNote} />;
       case "settings":
         return <Settings />;
       case "newnote":
-        return <NewNote content='' onLoging={(note)=>{setNotes([note,...notes])}}/>;
+        return <NewNote onLoging={(note)=>{setNotes([note,...notes]);setPage('notes')}}/>;
+      case "editnote":
+        return <NewNote onLoging={handleUpdateNote} note={editNote} update />;
       default:
-        return <Notes notes={notes} onNotesChange={setNotes} />;
+        return <Notes notes={notes} onNotesChange={setNotes} onEditNote={handleEditNote} />;
     }
   }
 

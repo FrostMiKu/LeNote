@@ -9,7 +9,7 @@ interface EditorProps {
   note: NoteType;
   setNote: (note: NoteType) => void;
   setVd: (vd: Vditor) => void;
-  onLoging: () => void;
+  onClick: () => void;
 };
 
 const Editor = (props: EditorProps) => {
@@ -33,7 +33,7 @@ const Editor = (props: EditorProps) => {
       <div ref={editorRef} className="vditor" />
       <div className="flex justify-between items-center mt-4">
         <Tags tags={props.note.tags} setTags={setTags} />
-        <Button type="primary" onClick={props.onLoging}>✍🏼 Loging!</Button>
+        <Button type="primary" onClick={props.onClick}>✍🏼 Loging!</Button>
       </div>
     </div>
   );

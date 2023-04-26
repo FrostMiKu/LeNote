@@ -3,15 +3,14 @@ import Editor from "../components/Editor";
 import Tags from "../components/Tags";
 import { Button, Space, Typography, notification } from "antd";
 import { TagType, MockTags, NoteType } from "../data/note";
-import { addNote } from "../api/note";
+import { addNote, updateNote } from "../api/note";
 import Vditor from "vditor";
 
 const { Title } = Typography;
 
 interface NewNoteProps {
-    title?: string;
-    content: string;
-    tags?: TagType[];
+    update?: boolean;
+    note?: NoteType;
     onLoging: (note:NoteType) => void;
 }
 const openNotification = (code: number) => {
@@ -50,8 +49,7 @@ const emptyNote = ():NoteType=>{return {id:0, content:"", create_date:Date.now()
 
 const NewNote = (props: NewNoteProps) => {
     const [vd, setVd] = useState<Vditor>();
-    // const [tags, setTags] = useState<TagType[]>(props.tags ? props.tags : []);
-    const [note, setNote] = useState<NoteType>(emptyNote());
+    const [note, setNote] = useState<NoteType>(props.note||emptyNote());
 
     const handleClick = () => {
         if (vd === undefined) {
@@ -62,21 +60,34 @@ const NewNote = (props: NewNoteProps) => {
             openNotification(-1);
             return;
         }
-        addNote({...note, content:vd.getValue(), create_date:Date.now()}).then(
-            res => {
-                openNotification(res.code);
-                if (res.code === 0) {
-                    vd.setValue("");
-                    setNote(emptyNote());
-                    props.onLoging(res.data.note);
+        if(props.update){
+            updateNote({...note, content:vd.getValue()}).then(
+                res => {
+                    openNotification(res.code);
+                    if (res.code === 0) {
+                        vd.setValue("");
+                        setNote(emptyNote());
+                        props.onLoging(res.data.note);
+                    }
                 }
-            }
-        ).catch(_ => openNotification(-3));
+            ).catch(_ => openNotification(-3));
+        }else{
+            addNote({...note, content:vd.getValue(), create_date:Date.now()}).then(
+                res => {
+                    openNotification(res.code);
+                    if (res.code === 0) {
+                        vd.setValue("");
+                        setNote(emptyNote());
+                        props.onLoging(res.data.note);
+                    }
+                }
+            ).catch(_ => openNotification(-3));
+        }
     }
     return (
         <div className="px-16 py-8 h-screen">
-            <Title>{props.title ? props.title : "📝 新建笔记"}</Title>
-            <Editor setVd={setVd} note={note} setNote={setNote} onLoging={handleClick} />
+            <Title>{props.update? "📝 更新笔记" : "📝 新建笔记"}</Title>
+            <Editor setVd={setVd} note={note} setNote={setNote} onClick={handleClick} />
         </div>
     );
 }

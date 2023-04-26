@@ -13,6 +13,7 @@ const { Title, Text } = Typography;
 interface NotesProps {
     notes: NoteType[];
     onNotesChange: (notes: NoteType[]) => void;
+    onEditNote: (note: NoteType) => void;
 }
 
 const Notes: React.FC<NotesProps> = (props) => {
@@ -37,9 +38,7 @@ const Notes: React.FC<NotesProps> = (props) => {
     }
 
     const handleLoadMore = () => {
-        setLoading(true);
-        console.log(notes.length);
-
+        setLoading(true); //todo: loading
         getNotes(notes.length, 10).then(
             res => {
                 if (res.data.notes.length === 0) {
@@ -69,7 +68,7 @@ const Notes: React.FC<NotesProps> = (props) => {
                 <Title>{title}</Title>
                 {notesFilter(notes).length === 0 ? <Empty description={<Text className="text-gray-400">暂无笔记</Text>} className="w-full" /> :
                     <>
-                        {notesFilter(notes).map(note => <NoteCard key={note.id} note={note} onDelete={handleDelete} />)}
+                        {notesFilter(notes).map(note => <NoteCard key={note.id} note={note} onDelete={handleDelete} onEdit={props.onEditNote} />)}
                         <div className="cursor-pointer w-full text-center text-gray-400" onClick={handleLoadMore}>点击这里，加载更多</div>
                     </>
                 }

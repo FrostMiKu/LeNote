@@ -9,16 +9,21 @@ enum Order {
 }
 
 export const getNotes = async (offset=0,limit=10,order=Order.DESC) => {
-  const { data } = await axios.get(baseUrl+"/notes",{params:{offset,limit,order}});
+  const { data } = await axios.get(baseUrl+"/note",{params:{offset,limit,order}});
   return data;
 }
 
 export const addNote = async (note:NoteType) => {
-  const { data } = await axios.post(baseUrl+"/notes",{...note});
+  const { data } = await axios.post(baseUrl+"/note",{...note});
   return data;
 }
 
 export const delNote = async (id:number) => {
-  const { data } = await axios.delete(baseUrl+"/notes/"+id);
+  const { data } = await axios.delete(baseUrl+"/note/"+id);
+  return data;
+}
+
+export const updateNote = async (note:NoteType) => {
+  const { data } = await axios.put(baseUrl+"/note/",{...note});
   return data;
 }
