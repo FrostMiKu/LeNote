@@ -48,7 +48,7 @@ function App() {
       case "newnote":
         return <NewNote tags={tags} onLoging={(note)=>{setNotes([note,...notes]);setPage('notes')}}/>;
       case "editnote":
-        return <NewNote onLoging={handleUpdateNote} note={editNote} update />;
+        return <NewNote tags={tags} onLoging={handleUpdateNote} note={editNote} update />;
       default:
         return <Notes notes={notes} tags={tags} onNotesChange={setNotes} onEditNote={handleEditNote} />;
     }

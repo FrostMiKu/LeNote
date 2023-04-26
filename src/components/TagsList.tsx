@@ -9,7 +9,7 @@ interface TagsEditorProps {
 const TagsList = (props: TagsEditorProps) => {
     return (
         <Space size={[2,6]} wrap>
-            {props.tags.map(tag => <Tag key={tag.id} bordered={false} color={tag.color} onClick={()=>{props.onClick?props.onClick(tag):undefined}}>{tag.name}</Tag>)}
+            {props.tags.map(tag => <Tag className="cursor-pointer" key={tag.id} bordered={false} color={tag.color} onClick={()=>{props.onClick?props.onClick(tag):undefined}}>{tag.name}</Tag>)}
         </Space>
     )
 };

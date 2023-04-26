@@ -24,6 +24,7 @@ const items: MenuProps['items'] = [
     {
       label: '删除',
       key: 'delete',
+      danger: true,
     },
   ];
 

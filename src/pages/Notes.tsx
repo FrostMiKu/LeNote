@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { sortBy, filter } from 'remeda'
-import { Typography, notification, Empty, Button, Tooltip } from "antd";
+import { sortBy, filter, type } from 'remeda'
+import { Typography, notification, Empty, Button, Tooltip, FloatButton } from "antd";
 import NoteCard from "../components/NoteCard";
 import { NoteType, TagType } from '../data/note';
-import HeatMap from '@uiw/react-heat-map';
-import { getNotes } from "../api/api";
+import HeatMap, { HeatMapValue } from '@uiw/react-heat-map';
+import { getHeatMap, getNotes } from "../api/api";
 import { notes2HeatmapData } from "../utils";
 import dayjs from "dayjs";
 import TagsList from "../components/TagsList";
@@ -22,6 +22,7 @@ interface NotesProps {
 const Notes: React.FC<NotesProps> = (props) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [title, setTitle] = useState<string>('📔 Notes');
+    const [heatMapValue, setHeatMapValue] = useState<HeatMapValue[]>([]);
     const [filters, setFilters] = useState<((note:NoteType)=>boolean)[]>([_=>true]);
     const { notes, onNotesChange } = props;
 
@@ -35,6 +36,14 @@ const Notes: React.FC<NotesProps> = (props) => {
                 });
         }
     }, [notes]);
+
+    useEffect(()=>{
+        getHeatMap().then(
+            res => {
+                setHeatMapValue(res.data.heatmap);
+            }
+        );
+    },[]);
 
     const notesFilter = (notes: NoteType[]) => {
         return filter(notes, note => filters.every(filter => filter(note)));
@@ -67,6 +76,7 @@ const Notes: React.FC<NotesProps> = (props) => {
 
     return (
         <div className='flex justify-between'>
+            {/* <FloatButton onClick={() => console.log('click')} type="primary" /> */}
             <div className='px-16 py-8 w-full h-screen overflow-scroll'>
                 <Title>{title}</Title>
                 {notesFilter(notes).length === 0 ? <Empty description={<Text className="text-gray-400">暂无笔记</Text>} className="w-full" /> :
@@ -79,19 +89,22 @@ const Notes: React.FC<NotesProps> = (props) => {
             <div className='px-4 py-8 h-full'>
                 <HeatMap
                     width={300}
-                    value={notes2HeatmapData(notes)}
+                    value={heatMapValue}
                     style={{ color: '#ad001d' }}
                     startDate={dayjs().subtract(19, 'week').toDate()}
                     endDate={new Date()}
                     rectRender={(props, data) => {
                         return (
                             <Tooltip key={props.key} placement="top" title={`${data.date} 共 ${data.count || 0} 条 Note`}>
-                                <rect {...props} />
+                                <rect {...props} onClick={()=>{
+                                    console.log(data.date);
+                                    setFilters([note => dayjs(note.create_date).isSame(data.date, 'day')]);
+                                }}/>
                             </Tooltip>
                         );
                     }}
                 />
-                <Title level={3}>🏷️ Tags</Title>
+                <Title className="mt-0" level={3}>🏷️ Tags</Title>
                 <TagsList tags={props.tags} onClick={(tag) => {
                     setFilters([note => filter(note.tags, item => item.name.toLowerCase() === tag.name.toLocaleLowerCase()).length > 0]);
                     setTitle(tag.name);
