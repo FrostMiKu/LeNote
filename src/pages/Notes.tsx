@@ -97,7 +97,7 @@ const Notes: React.FC<NotesProps> = (props) => {
                         return (
                             <Tooltip key={props.key} placement="top" title={`${data.date} 共 ${data.count || 0} 条 Note`}>
                                 <rect {...props} onClick={()=>{
-                                    console.log(data.date);
+                                    setTitle(data.date);
                                     setFilters([note => dayjs(note.create_date).isSame(data.date, 'day')]);
                                 }}/>
                             </Tooltip>

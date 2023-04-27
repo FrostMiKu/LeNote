@@ -9,6 +9,7 @@ interface TagsEditorProps {
     tags: TagType[];
     setTags: (tags: TagType[]) => void;
     all_tags?: TagType[];
+    canAdd?: boolean;
 }
 
 // 随机生成颜色, todo: 用户直接设置颜色
@@ -81,7 +82,7 @@ const Tags: React.FC<TagsEditorProps> = (props: TagsEditorProps) => {
                     )
                     }
                 </div>
-                {props.tags.length < 8 ? //最多8个标签，前端限制
+                {props.tags.length < 8 && props.canAdd ? //最多8个标签，前端限制
                     <div>
                         {inputVisible ? (
                             <AutoComplete

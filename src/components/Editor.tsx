@@ -33,7 +33,7 @@ const Editor = (props: EditorProps) => {
     <div className="h-3/4 p-8 shadow-md rounded-md bg-white">
       <div ref={editorRef} className="vditor" />
       <div className="flex justify-between items-center mt-4">
-        <Tags tags={props.note.tags} all_tags={props.tags} setTags={setTags} />
+        <Tags tags={props.note.tags} all_tags={props.tags} setTags={setTags} canAdd />
         <Button type="primary" onClick={props.onClick}>✍🏼 Loging!</Button>
       </div>
     </div>
