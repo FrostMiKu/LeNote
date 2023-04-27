@@ -42,15 +42,16 @@ function App() {
   function switchPages(page: string) {
     switch (page) {
       case "notes":
-        return <Notes notes={notes} tags={tags} onNotesChange={setNotes} onEditNote={handleEditNote} />;
+        return <Notes notes={notes} tags={tags} onNotesChange={setNotes} onEditNote={handleEditNote} onNewNote={()=>setPage("newnote")} />;
       case "settings":
         return <Settings />;
       case "newnote":
         return <NewNote tags={tags} onLoging={(note)=>{setNotes([note,...notes]);setPage('notes')}}/>;
       case "editnote":
         return <NewNote tags={tags} onLoging={handleUpdateNote} note={editNote} update />;
+      case "tags":
       default:
-        return <Notes notes={notes} tags={tags} onNotesChange={setNotes} onEditNote={handleEditNote} />;
+        return <Settings />; // aka todo...
     }
   }
 

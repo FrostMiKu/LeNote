@@ -13,7 +13,7 @@ const MainMenu = (props: MenuProps) => {
   return (
     <Menu onClick={handleClick} defaultSelectedKeys={['overview']} items={[
       {key: 'notes', label: 'Notes'},
-      {key: 'newnote', label: 'New'},
+      {key: 'tags', label: 'Tags'},
       {key: 'settings', label: 'Settings'},
     ]}/>
   );

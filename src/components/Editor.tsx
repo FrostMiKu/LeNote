@@ -22,8 +22,63 @@ const Editor = (props: EditorProps) => {
         props.setVd(vditor);
         vditor.setValue(props.note.content);
       },
+      mode: "ir",
+      placeholder: "写点啥呢 🤔",
       cache: { id: props.note.id.toString() },
       height: 'calc(100% - 3rem)',
+      toolbar: [
+        "emoji",
+        "headings",
+        "bold",
+        "italic",
+        "strike",
+        "link",
+        "|",
+        "list",
+        "ordered-list",
+        "check",
+        "outdent",
+        "indent",
+        "|",
+        "quote",
+        "line",
+        "code",
+        "inline-code",
+        "insert-before",
+        "insert-after",
+        "|",
+        "upload",
+        "table",
+        "|",
+        "undo",
+        "redo",
+        "|",
+        "fullscreen",
+        "edit-mode",
+        {
+            name: "more",
+            toolbar: [
+                "both",
+                "code-theme",
+                "content-theme",
+                "export",
+                "outline",
+                "preview",
+                "devtools",
+            ]
+        },
+      ],
+      upload: {
+        accept: 'image/*, .mp3, .wav, .rar, .zip, .pdf',
+        url: "http://localhost:8000/upload/editor",
+        // linkToImgUrl: 'http://localhost:8000/upload/fetch',
+        filename (name) {
+          return name
+            .replace(/[^(a-zA-Z0-9\u4e00-\u9fa5\.)]/g, '')
+            .replace(/[\?\\/:|<>\*\[\]\(\)\$%\{\}@~]/g, '')
+            .replace('/\\s/g', '')
+        },
+      }
     });
   }, []);
   const setTags = (tags: TagType[]) => {

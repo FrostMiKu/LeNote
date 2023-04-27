@@ -17,6 +17,7 @@ interface NotesProps {
     tags: TagType[];
     onNotesChange: (notes: NoteType[]) => void;
     onEditNote: (note: NoteType) => void;
+    onNewNote: () => void;
 }
 
 const Notes: React.FC<NotesProps> = (props) => {
@@ -76,7 +77,7 @@ const Notes: React.FC<NotesProps> = (props) => {
 
     return (
         <div className='flex justify-between'>
-            {/* <FloatButton onClick={() => console.log('click')} type="primary" /> */}
+            <FloatButton tooltip={<div>✍🏼 新建笔记</div>} onClick={props.onNewNote} type="primary" />
             <div className='px-16 py-8 w-full h-screen overflow-scroll'>
                 <Title>{title}</Title>
                 {notesFilter(notes).length === 0 ? <Empty description={<Text className="text-gray-400">暂无笔记</Text>} className="w-full" /> :
@@ -87,6 +88,7 @@ const Notes: React.FC<NotesProps> = (props) => {
                 }
             </div>
             <div className='px-4 py-8 h-full'>
+                <Title level={3}>📅 Calendar</Title>
                 <HeatMap
                     width={300}
                     value={heatMapValue}
