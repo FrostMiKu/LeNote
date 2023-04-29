@@ -87,14 +87,18 @@ const Notes: React.FC<NotesProps> = (props) => {
                     </>
                 }
             </div>
-            <div className='px-4 py-8 h-full'>
+            <div className='pr-4 py-8 h-full w-min'>
                 <Title level={3}>📅 Calendar</Title>
                 <HeatMap
                     width={300}
                     value={heatMapValue}
                     style={{ color: '#ad001d' }}
+                    legendCellSize={0}
                     startDate={dayjs().subtract(19, 'week').toDate()}
                     endDate={new Date()}
+                    rectProps={{
+                        rx: 5
+                    }}
                     rectRender={(props, data) => {
                         return (
                             <Tooltip key={props.key} placement="top" title={`${data.date} 共 ${data.count || 0} 条 Note`}>
