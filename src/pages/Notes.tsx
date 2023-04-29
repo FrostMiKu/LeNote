@@ -92,7 +92,7 @@ const Notes: React.FC<NotesProps> = (props) => {
                 <HeatMap
                     width={300}
                     value={heatMapValue}
-                    style={{ color: '#ad001d' }}
+                    style={{ color: '#ad001d', height: 130 }}
                     legendCellSize={0}
                     startDate={dayjs().subtract(19, 'week').toDate()}
                     endDate={new Date()}
