@@ -7,14 +7,29 @@ import HeatMap, { HeatMapValue } from '@uiw/react-heat-map';
 import { getHeatMap, getNotes, getNotesByDate, getNotesByTagID } from "../api/api";
 import dayjs from "dayjs";
 import TagsList from "../components/TagsList";
+import { FilterOutlined } from "@ant-design/icons";
+import { randomColor } from "../utils";
 
 const { Title, Text } = Typography;
 
-declare type NotesProps = {
+type NotesProps = {
     tags: TagType[];
     onEditNote: (note: NoteType) => void;
     onNewNote: () => void;
 }
+
+type NoteFilter = TagType & {
+    filter: (note: NoteType) => boolean;
+};
+
+const mockxx = [
+    {
+        "id": 1,
+        "name": "学习",
+        "color": "#f50",
+        "filter": () => true
+    }
+]
 
 const Notes: React.FC<NotesProps> = (props) => {
     const [notes, setNotes] = useState<NoteType[]>([]);
@@ -22,7 +37,7 @@ const Notes: React.FC<NotesProps> = (props) => {
     const [title, setTitle] = useState<string>('📔 Notes');
     const [api, setApi] = useState<(offset: number, limit: number) => Promise<{ data: { notes: NoteType[] } }>>(() => getNotes);
     const [heatMapValue, setHeatMapValue] = useState<HeatMapValue[]>([]);
-    const [filters, setFilters] = useState<((note: NoteType) => boolean)[]>([_ => true]);
+    const [filters, setFilters] = useState<NoteFilter[]>([]);
 
     useEffect(() => {
         api(0, 5).then(
@@ -41,7 +56,7 @@ const Notes: React.FC<NotesProps> = (props) => {
     }, []);
 
     const notesFilter = (notes: NoteType[]) => {
-        return filter(notes, note => filters.every(filter => filter(note)));
+        return filter(notes, note => filters.every(i => i.filter(note)));
     }
 
     const handleLoadMore = () => {
@@ -69,11 +84,26 @@ const Notes: React.FC<NotesProps> = (props) => {
         setNotes(filter(notes, note => note.id !== id));
     }
 
+    const handleFilterClose = (tag: TagType) => {
+        const new_filters = filter(filters, i => i.id !== tag.id)
+        setFilters(new_filters);
+        if (new_filters.length === 0) {
+            setTitle('📔 Notes');
+            setApi(()=>getNotes);
+        }
+    }
+
     return (
         <div className='flex justify-between'>
             <FloatButton tooltip={<div>✍🏼 新建笔记</div>} onClick={props.onNewNote} type="primary" />
             <div className='px-16 py-8 w-full h-screen overflow-scroll'>
                 <Title>{title}</Title>
+                {filters.length > 0 ?
+                    <>
+                        <Text className="text-gray-400"><FilterOutlined /> Filters: </Text>
+                        <TagsList className="mb-4" closeable tags={filters} onClose={handleFilterClose} />
+                    </> : null
+                }
                 {notesFilter(notes).length === 0 ? <Empty description={<Text className="text-gray-400">暂无笔记</Text>} className="w-full" /> :
                     <>
                         {notesFilter(notes).map(note => <NoteCard key={note.id} note={note} onDelete={handleDelete} onEdit={props.onEditNote} />)}
@@ -81,7 +111,7 @@ const Notes: React.FC<NotesProps> = (props) => {
                     </>
                 }
             </div>
-            <div className='pr-4 py-8 h-full w-min'>
+            <div className='px-4 py-8 h-full w-min'>
                 <Title level={3}>📅 Calendar</Title>
                 <HeatMap
                     width={300}
@@ -98,7 +128,15 @@ const Notes: React.FC<NotesProps> = (props) => {
                             <Tooltip key={props.key} placement="top" title={`${data.date} 共 ${data.count || 0} 条 Note`}>
                                 <rect {...props} onClick={() => {
                                     setTitle(data.date);
-                                    setFilters([note => dayjs(note.create_date).isSame(data.date, 'day')]);
+                                    setFilters([
+                                        {
+                                            id: 'date',
+                                            name: '📅 ' + data.date,
+                                            color: randomColor(), 
+                                            filter: note => dayjs(note.create_date).isSame(data.date, 'day')
+                                        },
+                                        ...filter(filters, i => i.id !== 'date')
+                                    ]);
                                     const seletedDay = dayjs(data.date)
                                     setApi(() => async (offset: number, limit: number) => getNotesByDate(seletedDay.valueOf(), seletedDay.endOf('day').valueOf(), offset, limit));
                                 }} />
@@ -107,10 +145,19 @@ const Notes: React.FC<NotesProps> = (props) => {
                     }}
                 />
                 <Title className="mt-0" level={3}>🏷️ Tags</Title>
-                <TagsList tags={props.tags} onClick={(tag) => {
-                    setFilters([note => filter(note.tags, item => item.name.toLowerCase() === tag.name.toLocaleLowerCase()).length > 0]);
+                <TagsList tags={props.tags} clickable onClick={(tag) => {
+                    // setFilters([note => filter(note.tags, item => item.name.toLowerCase() === tag.name.toLocaleLowerCase()).length > 0]);
                     setTitle(tag.name);
-                    setApi(() => async (offset: number, limit: number) => getNotesByTagID(tag.id, offset, limit));
+                    setFilters([
+                        {
+                            id: tag.id,
+                            name: tag.name,
+                            color: tag.color,
+                            filter: note => filter(note.tags, item => item.name.toLowerCase() === tag.name.toLocaleLowerCase()).length > 0
+                        },
+                        ...filter(filters, i => i.id !== tag.id)
+                    ]);
+                    setApi(() => async (offset: number, limit: number) => getNotesByTagID(tag.id as number, offset, limit));
                 }} />
             </div>
         </div>

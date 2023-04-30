@@ -8,7 +8,7 @@ export type NoteType = {
 }
 
 export type TagType = {
-    id: number;
+    id: number|string;
     name: string;
     color: string;
 }

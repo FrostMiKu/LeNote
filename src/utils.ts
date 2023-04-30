@@ -19,3 +19,20 @@ export const notes2HeatmapData = (notes:NoteType[]) => {
     });
     return data;
 }
+
+export const randomColor = () => {
+    const colors = [
+        "magenta",
+        "red",
+        "volcano",
+        "orange",
+        "gold",
+        "lime",
+        "green",
+        "cyan",
+        "blue",
+        "geekblue",
+        "purple"
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+}

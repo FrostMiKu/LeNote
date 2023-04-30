@@ -4,6 +4,7 @@ import { AutoComplete, InputRef } from 'antd';
 import { Space, Tag, theme } from 'antd';
 import { TagType } from '../data/note';
 import { objOf, uniqBy } from 'remeda';
+import { randomColor } from '../utils';
 
 type TagsEditorProps = {
     tags: TagType[];
@@ -13,23 +14,6 @@ type TagsEditorProps = {
 }
 
 // 随机生成颜色, todo: 用户直接设置颜色
-const randomColor = () => {
-    const colors = [
-        "magenta",
-        "red",
-        "volcano",
-        "orange",
-        "gold",
-        "lime",
-        "green",
-        "cyan",
-        "blue",
-        "geekblue",
-        "purple"
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
-}
-
 const Tags: React.FC<TagsEditorProps> = (props: TagsEditorProps) => {
     const { token } = theme.useToken();
     const [inputVisible, setInputVisible] = useState(false);
