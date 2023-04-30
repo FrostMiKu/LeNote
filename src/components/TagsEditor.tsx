@@ -5,7 +5,7 @@ import { Space, Tag, theme } from 'antd';
 import { TagType } from '../data/note';
 import { objOf, uniqBy } from 'remeda';
 
-interface TagsEditorProps {
+type TagsEditorProps = {
     tags: TagType[];
     setTags: (tags: TagType[]) => void;
     all_tags?: TagType[];

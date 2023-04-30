@@ -8,7 +8,7 @@ import Vditor from "vditor";
 
 const { Title } = Typography;
 
-interface NewNoteProps {
+type NewNoteProps = {
     update?: boolean;
     note?: NoteType;
     tags?: TagType[]; //for auto complete
@@ -48,7 +48,7 @@ const openNotification = (code: number) => {
 
 const emptyNote = ():NoteType=>{return {id:0, content:"", create_date:Date.now(), tags:[]}}
 
-const NewNote = (props: NewNoteProps) => {
+const EditNote = (props: NewNoteProps) => {
     const [vd, setVd] = useState<Vditor>();
     const [note, setNote] = useState<NoteType>(props.note||emptyNote());
 
@@ -93,4 +93,4 @@ const NewNote = (props: NewNoteProps) => {
     );
 }
 
-export default NewNote;
+export default EditNote;

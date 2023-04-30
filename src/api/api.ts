@@ -18,6 +18,16 @@ export const getNotes = async (offset=0,limit=10,order=Order.DESC) => {
   return data;
 }
 
+export const getNotesByTagID = async (tag_id:number,offset=0,limit=10,order=Order.DESC) => {
+  const { data } = await axios.get(baseUrl+"/note/tag/"+tag_id.toString(),{params:{offset,limit,order}});
+  return data;
+}
+
+export const getNotesByDate = async (start_date:number,end_date:number,offset=0,limit=10,order=Order.DESC) => {
+  const { data } = await axios.get(baseUrl+"/note/date/"+start_date.toString()+"/"+end_date.toString(),{params:{offset,limit,order}});
+  return data;
+}
+
 export const addNote = async (note:NoteType) => {
   const { data } = await axios.post(baseUrl+"/note",{...note});
   return data;

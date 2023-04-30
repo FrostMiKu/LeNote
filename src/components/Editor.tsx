@@ -5,7 +5,7 @@ import { NoteType, TagType } from "../data/note";
 import { Button } from "antd";
 import Tags from "./TagsEditor";
 
-interface EditorProps {
+type EditorProps = {
   note: NoteType;
   tags?: TagType[];
   setNote: (note: NoteType) => void;

@@ -1,7 +1,7 @@
 import { Space, Tag } from "antd";
 import { TagType } from "../data/note";
 
-interface TagsEditorProps {
+type TagsEditorProps = {
     tags: TagType[];
     onClick?: (tag: TagType) => void;
 }

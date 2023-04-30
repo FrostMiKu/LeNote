@@ -1,13 +1,13 @@
 import { HeatMapValue } from "@uiw/react-heat-map";
 
-export interface NoteType {
+export type NoteType = {
     id: number;
     content: string;
     tags: TagType[];
     create_date: Date|number;
 }
 
-export interface TagType {
+export type TagType = {
     id: number;
     name: string;
     color: string;

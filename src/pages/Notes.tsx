@@ -1,50 +1,44 @@
 import { useEffect, useState } from "react";
-import { sortBy, filter, type } from 'remeda'
-import { Typography, notification, Empty, Button, Tooltip, FloatButton } from "antd";
+import { sortBy, filter } from 'remeda'
+import { Typography, notification, Empty, Tooltip, FloatButton } from "antd";
 import NoteCard from "../components/NoteCard";
 import { NoteType, TagType } from '../data/note';
 import HeatMap, { HeatMapValue } from '@uiw/react-heat-map';
-import { getHeatMap, getNotes } from "../api/api";
-import { notes2HeatmapData } from "../utils";
+import { getHeatMap, getNotes, getNotesByDate, getNotesByTagID } from "../api/api";
 import dayjs from "dayjs";
 import TagsList from "../components/TagsList";
-import { TagsFilled } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
-interface NotesProps {
-    notes: NoteType[];
+declare type NotesProps = {
     tags: TagType[];
-    onNotesChange: (notes: NoteType[]) => void;
     onEditNote: (note: NoteType) => void;
     onNewNote: () => void;
 }
 
 const Notes: React.FC<NotesProps> = (props) => {
-    const [loading, setLoading] = useState<boolean>(false);
+    const [notes, setNotes] = useState<NoteType[]>([]);
+    const [loading, setLoading] = useState<boolean>(false); //todo: loading
     const [title, setTitle] = useState<string>('📔 Notes');
+    const [api, setApi] = useState<(offset: number, limit: number) => Promise<{ data: { notes: NoteType[] } }>>(() => getNotes);
     const [heatMapValue, setHeatMapValue] = useState<HeatMapValue[]>([]);
-    const [filters, setFilters] = useState<((note:NoteType)=>boolean)[]>([_=>true]);
-    const { notes, onNotesChange } = props;
+    const [filters, setFilters] = useState<((note: NoteType) => boolean)[]>([_ => true]);
 
     useEffect(() => {
-        if (notes.length === 0) {
-            getNotes(0, 10).then(
-                res => {
-                    onNotesChange(
-                        sortBy(res.data.notes as NoteType[], [note => note.create_date, 'desc'])
-                    );
-                });
-        }
-    }, [notes]);
+        api(0, 5).then(
+            res => {
+                setNotes(res.data.notes);
+            }
+        );
+    }, [api]);
 
-    useEffect(()=>{
+    useEffect(() => {
         getHeatMap().then(
             res => {
                 setHeatMapValue(res.data.heatmap);
             }
         );
-    },[]);
+    }, []);
 
     const notesFilter = (notes: NoteType[]) => {
         return filter(notes, note => filters.every(filter => filter(note)));
@@ -52,14 +46,14 @@ const Notes: React.FC<NotesProps> = (props) => {
 
     const handleLoadMore = () => {
         setLoading(true); //todo: loading
-        getNotes(notes.length, 10).then(
+        api(notes.length, 10).then(
             res => {
                 if (res.data.notes.length === 0) {
                     notification.open({
                         message: '没有更多了😊！',
                     });
                 } else {
-                    onNotesChange(
+                    setNotes(
                         sortBy(notes.concat(res.data.notes), [note => note.create_date, 'desc'])
                     );
                 }
@@ -72,7 +66,7 @@ const Notes: React.FC<NotesProps> = (props) => {
     }
 
     const handleDelete = (id: number) => {
-        onNotesChange(filter(notes, note => note.id !== id));
+        setNotes(filter(notes, note => note.id !== id));
     }
 
     return (
@@ -102,10 +96,12 @@ const Notes: React.FC<NotesProps> = (props) => {
                     rectRender={(props, data) => {
                         return (
                             <Tooltip key={props.key} placement="top" title={`${data.date} 共 ${data.count || 0} 条 Note`}>
-                                <rect {...props} onClick={()=>{
+                                <rect {...props} onClick={() => {
                                     setTitle(data.date);
                                     setFilters([note => dayjs(note.create_date).isSame(data.date, 'day')]);
-                                }}/>
+                                    const seletedDay = dayjs(data.date)
+                                    setApi(() => async (offset: number, limit: number) => getNotesByDate(seletedDay.valueOf(), seletedDay.endOf('day').valueOf(), offset, limit));
+                                }} />
                             </Tooltip>
                         );
                     }}
@@ -114,7 +110,8 @@ const Notes: React.FC<NotesProps> = (props) => {
                 <TagsList tags={props.tags} onClick={(tag) => {
                     setFilters([note => filter(note.tags, item => item.name.toLowerCase() === tag.name.toLocaleLowerCase()).length > 0]);
                     setTitle(tag.name);
-                } } />
+                    setApi(() => async (offset: number, limit: number) => getNotesByTagID(tag.id, offset, limit));
+                }} />
             </div>
         </div>
     );

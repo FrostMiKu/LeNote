@@ -1,6 +1,6 @@
 import { Menu } from 'antd';
 
-interface MenuProps {
+type MenuProps = {
   fn: (key: string) => void;
 }
 
@@ -13,6 +13,7 @@ const MainMenu = (props: MenuProps) => {
   return (
     <Menu onClick={handleClick} defaultSelectedKeys={['overview']} items={[
       {key: 'notes', label: 'Notes'},
+      {key: 'today', label: 'Today'},
       {key: 'tags', label: 'Tags'},
       {key: 'settings', label: 'Settings'},
     ]}/>

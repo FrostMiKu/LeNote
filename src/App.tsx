@@ -3,8 +3,7 @@ import { Layout, theme } from "antd";
 import MainMenu from './components/MainMenu'
 import Notes from "./pages/Notes";
 import Settings from "./pages/Settings";
-import NewNote from "./pages/NewNote";
-import Vditor from 'vditor';
+import EditNote from "./pages/EditNote";
 import { NoteType, TagType } from './data/note';
 import { getTags } from './api/api';
 
@@ -13,7 +12,6 @@ const { Sider, Content } = Layout;
 
 function App() {
   const [page, setPage] = useState("notes");
-  const [notes, setNotes] = useState<NoteType[]>([]);
   const [tags, setTags] = useState<TagType[]>([]);
   const [editNote, setEditNote] = useState<NoteType>();
   const {
@@ -22,33 +20,25 @@ function App() {
 
   useEffect(() => {
     getTags().then((res) => {
-      setTags(res.data.tags);
+      setTags(res.data.tags);      
     });
-  }, [notes]);
+  }, []);
 
   const handleEditNote = (note: NoteType) => {
     setEditNote(note);
     setPage("editnote");
   }
 
-  const handleUpdateNote = (note: NoteType) => {
-    const item = notes.find((n) => n.id === note.id);
-    if (item === undefined) return;
-    item.content = note.content;
-    item.tags = note.tags;
-    setPage("notes");
-  }
-
   function switchPages(page: string) {
     switch (page) {
       case "notes":
-        return <Notes notes={notes} tags={tags} onNotesChange={setNotes} onEditNote={handleEditNote} onNewNote={()=>setPage("newnote")} />;
+        return <Notes tags={tags} onEditNote={handleEditNote} onNewNote={()=>setPage("newnote")} />;
       case "settings":
         return <Settings />;
       case "newnote":
-        return <NewNote tags={tags} onLoging={(note)=>{setNotes([note,...notes]);setPage('notes')}}/>;
+        return <EditNote tags={tags} onLoging={()=>{setPage('notes')}}/>;
       case "editnote":
-        return <NewNote tags={tags} onLoging={handleUpdateNote} note={editNote} update />;
+        return <EditNote tags={tags} onLoging={()=>{setPage('notes')}} note={editNote} update />;
       case "tags":
       default:
         return <Settings />; // aka todo...

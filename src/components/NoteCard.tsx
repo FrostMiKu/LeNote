@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
 dayjs.extend(relativeTime);
 
-interface NoteCardProps {
+type NoteCardProps = {
     note: NoteType;
     onDelete?: (id: number) => void;
     onEdit?: (note: NoteType) => void;
