@@ -20,6 +20,7 @@ type NotesProps = {
 
 type NoteFilter = TagType & {
     filter: (note: NoteType) => boolean;
+    api?: (offset: number, limit: number) => Promise<{ data: { notes: NoteType[] } }>;
 };
 
 const mockxx = [
@@ -55,6 +56,16 @@ const Notes: React.FC<NotesProps> = (props) => {
         );
     }, []);
 
+    useEffect(() => {
+        if (filters.length === 0) {
+            setTitle('📔 Notes');
+            setApi(() => getNotes);
+        } else {
+            setTitle('📔 Notes - Filter');
+            setApi(() => filters[filters.length-1].api ?? getNotes);
+        }
+    }, [filters]);
+
     const notesFilter = (notes: NoteType[]) => {
         return filter(notes, note => filters.every(i => i.filter(note)));
     }
@@ -85,12 +96,7 @@ const Notes: React.FC<NotesProps> = (props) => {
     }
 
     const handleFilterClose = (tag: TagType) => {
-        const new_filters = filter(filters, i => i.id !== tag.id)
-        setFilters(new_filters);
-        if (new_filters.length === 0) {
-            setTitle('📔 Notes');
-            setApi(()=>getNotes);
-        }
+        setFilters(filter(filters, i => i.id !== tag.id));
     }
 
     return (
@@ -127,18 +133,18 @@ const Notes: React.FC<NotesProps> = (props) => {
                         return (
                             <Tooltip key={props.key} placement="top" title={`${data.date} 共 ${data.count || 0} 条 Note`}>
                                 <rect {...props} onClick={() => {
-                                    setTitle(data.date);
+                                    const seletedDay = dayjs(data.date);
                                     setFilters([
+                                        ...filter(filters, i => i.id !== 'date'),
                                         {
                                             id: 'date',
                                             name: '📅 ' + data.date,
-                                            color: randomColor(), 
-                                            filter: note => dayjs(note.create_date).isSame(data.date, 'day')
-                                        },
-                                        ...filter(filters, i => i.id !== 'date')
+                                            color: randomColor(),
+                                            filter: note => dayjs(note.create_date).isSame(data.date, 'day'),
+                                            api: async (offset: number, limit: number) => getNotesByDate(seletedDay.valueOf(), seletedDay.endOf('day').valueOf(), offset, limit)
+                                        }
                                     ]);
-                                    const seletedDay = dayjs(data.date)
-                                    setApi(() => async (offset: number, limit: number) => getNotesByDate(seletedDay.valueOf(), seletedDay.endOf('day').valueOf(), offset, limit));
+                                    // setApi(() => async (offset: number, limit: number) => getNotesByDate(seletedDay.valueOf(), seletedDay.endOf('day').valueOf(), offset, limit));
                                 }} />
                             </Tooltip>
                         );
@@ -146,18 +152,16 @@ const Notes: React.FC<NotesProps> = (props) => {
                 />
                 <Title className="mt-0" level={3}>🏷️ Tags</Title>
                 <TagsList tags={props.tags} clickable onClick={(tag) => {
-                    // setFilters([note => filter(note.tags, item => item.name.toLowerCase() === tag.name.toLocaleLowerCase()).length > 0]);
-                    setTitle(tag.name);
                     setFilters([
+                        ...filter(filters, i => i.id !== tag.id),
                         {
                             id: tag.id,
                             name: tag.name,
                             color: tag.color,
-                            filter: note => filter(note.tags, item => item.name.toLowerCase() === tag.name.toLocaleLowerCase()).length > 0
-                        },
-                        ...filter(filters, i => i.id !== tag.id)
+                            filter: note => filter(note.tags, item => item.name.toLowerCase() === tag.name.toLocaleLowerCase()).length > 0,
+                            api: async (offset: number, limit: number) => getNotesByTagID(tag.id as number, offset, limit)
+                        }
                     ]);
-                    setApi(() => async (offset: number, limit: number) => getNotesByTagID(tag.id as number, offset, limit));
                 }} />
             </div>
         </div>
