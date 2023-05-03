@@ -41,7 +41,7 @@ const Notes: React.FC<NotesProps> = (props) => {
     const [filters, setFilters] = useState<NoteFilter[]>([]);
 
     useEffect(() => {
-        api(0, 5).then(
+        api(0, 10).then(
             res => {
                 setNotes(res.data.notes);
             }

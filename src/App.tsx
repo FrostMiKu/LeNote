@@ -22,7 +22,7 @@ function App() {
     getTags().then((res) => {
       setTags(res.data.tags);      
     });
-  }, []);
+  }, [page]);
 
   const handleEditNote = (note: NoteType) => {
     setEditNote(note);
