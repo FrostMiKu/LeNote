@@ -112,7 +112,7 @@ const Notes: React.FC<NotesProps> = (props) => {
                 }
                 {notesFilter(notes).length === 0 ? <Empty description={<Text className="text-gray-400">暂无笔记</Text>} className="w-full" /> :
                     <>
-                        {notesFilter(notes).map(note => <NoteCard key={note.id} note={note} onDelete={handleDelete} onEdit={props.onEditNote} />)}
+                        {notesFilter(notes).map(note => <NoteCard onDoubleClick={props.onEditNote} key={note.id} note={note} onDelete={handleDelete} onEdit={props.onEditNote} />)}
                         <div className="cursor-pointer w-full text-center text-gray-400" onClick={handleLoadMore}>点击这里，加载更多</div>
                     </>
                 }

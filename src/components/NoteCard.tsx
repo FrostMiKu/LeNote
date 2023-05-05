@@ -13,6 +13,7 @@ type NoteCardProps = {
     note: NoteType;
     onDelete?: (id: number) => void;
     onEdit?: (note: NoteType) => void;
+    onDoubleClick?: (note: NoteType) => void;
 }
 
 //todo: 实现功能
@@ -50,7 +51,13 @@ const NoteCard: React.FC<NoteCardProps> = (props: NoteCardProps) => {
         Vditor.preview(contentRef.current!, props.note.content);
     }, [props.note.content]);
     return (
-        <div className='bg-white shadow-md rounded-md px-8 py-4 mb-8'>
+        <div onDoubleClick={
+            ()=>{
+                props.onDoubleClick?props.onDoubleClick(props.note):undefined;
+            }
+        }
+             className='bg-white shadow-md rounded-md px-8 py-4 mb-8'
+        >
             <Dropdown menu={{ items, onClick:handleClick }} placement="bottom" arrow className='float-right'>
                 <MoreOutlined className='cursor-pointer'/>
             </Dropdown>

@@ -12,6 +12,11 @@ body {
   line-height: 1.5;
 }
 
+.vditor-task--done {
+  text-decoration: line-through;
+  color: rgb(156,163,175);
+}
+
 /* :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 

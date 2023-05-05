@@ -2,6 +2,7 @@ import axios from "axios";
 import { TagType, NoteType } from "../data/note";
 
 const baseUrl = "http://127.0.0.1:8000";
+// const baseUrl = "";
 
 enum Order {
   ASC = "asc",
@@ -39,7 +40,7 @@ export const delNote = async (id:number) => {
 }
 
 export const updateNote = async (note:NoteType) => {
-  const { data } = await axios.put(baseUrl+"/note/",{...note});
+  const { data } = await axios.put(baseUrl+"/note",{...note});
   return data;
 }
 

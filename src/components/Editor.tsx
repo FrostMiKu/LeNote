@@ -70,6 +70,7 @@ const Editor = (props: EditorProps) => {
       ],
       upload: {
         accept: 'image/*, .mp3, .wav, .rar, .zip, .pdf',
+        // url: "/upload/editor",
         url: "http://localhost:8000/upload/editor",
         // linkToImgUrl: 'http://localhost:8000/upload/fetch',
         filename (name) {
